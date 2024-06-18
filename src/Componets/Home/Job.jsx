@@ -11,7 +11,7 @@ function Job() {
     useEffect(()=>{
         const fetchData= async()=>{
             try {
-            const response= await axios.get(`https://internshipbackend-vwja.onrender.com/api/job`)
+            const response= await axios.get("https://backend-internarea-bs4w.onrender.com/api/job")
             setJobData(response.data)
         } catch (error) {
                console.log(error) 

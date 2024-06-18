@@ -20,6 +20,7 @@ import Postinternships from './Admin/Postinternships';
 import DeatilApplication from './Applications/DeatilApplication';
 import UserApplicatiom from './profile/UserApplicatiom';
 import UserapplicationDetail from "./Applications/DeatilApplicationUser"
+import PostJob from './Admin/PostJob'
 function App() {
   const user=useSelector(selectUser);
   const dispatch=useDispatch();
@@ -49,7 +50,7 @@ function App() {
 <Routes>
   <Route path='/' element={<Home/>}/>
 <Route path='/register' element={<Register/>}/>
-<Route path='/internship' element={<Intern/>}/>
+<Route path='/Internship' element={<Intern/>}/>
 <Route path='/Jobs' element={<JobAvl/>}/>
 <Route path='/profile' element={<Profile/>}/>
 <Route path='/detailjob' element={<JobDetail/>}/>
@@ -58,6 +59,7 @@ function App() {
 <Route path='/adminLogin' element={<AdminLogin/>}/>
 <Route path='/adminepanel' element={<Adminpanel/>}/>
 <Route path='/postInternship' element={<Postinternships/>}/>
+<Route path='/postJob' element={<PostJob/>}/>
 <Route path='/applications' element={<ViewAllApplication/>}/>
 <Route path='/UserapplicationDetail' element={< UserapplicationDetail/>}/>
 <Route path='/userapplication' element={<UserApplicatiom/>}/>

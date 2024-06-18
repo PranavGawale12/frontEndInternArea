@@ -9,7 +9,7 @@ function DeatilApplication() {
 const id=params.get("a")
 useEffect(()=>{
    const fetchData= async()=>{
-  const response=await axios.get(`https://internshipbackend-vwja.onrender.com/api/application/${id}`)
+  const response=await axios.get(`https://backend-internarea-bs4w.onrender.com/api/application/${id}`)
 
   setData([response.data])
    }

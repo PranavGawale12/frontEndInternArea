@@ -5,7 +5,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 function JobAvl() {
 
-const [serachCategory,setSearchCategory]=useState("");
+const [searchCategory,setSearchCategory]=useState("");
 const [searchLoaction,setSearchLocation]=useState("")
 const [jobData,setJobData]=useState([])
 const [filterJob,setFilterJob]=useState([])
@@ -13,14 +13,16 @@ const [isDivVisible,setDivVisible]=useState(false)
 useEffect(()=>{
   const fetchData= async()=>{
       try {
-      const response= await axios.get(`https://internshipbackend-vwja.onrender.com/api/job`)
+      const response= await axios.get("https://backend-internarea-bs4w.onrender.com/api/job")
       setJobData(response.data)
+      console.log(response.data)
   } catch (error) {
          console.log(error) 
   }
-}
+};
 fetchData();
-},[])
+},[]);
+
   const showDiv=()=>{
   setDivVisible(true)
   }
@@ -31,27 +33,33 @@ fetchData();
   const handleCategoryChange=(e)=>{
     const categeoryValue=e.target.value;
     setSearchCategory(categeoryValue);
-    setFilterJob([categeoryValue,searchLoaction])
+    filterJobs(categeoryValue, searchLoaction);
+    //setFilterJob([categeoryValue,searchLoaction])
   }
   
   const handleCategoryLocationChange=(e)=>{
     const loactionValue=e.target.value;
     setSearchLocation(loactionValue);
-    setFilterJob([serachCategory,loactionValue])
+    filterJobs(searchCategory, loactionValue);
+    //setFilterJob([searchCategory,loactionValue])
   }
 const filterJobs=(category,location)=>{
-  const filterData=jobData.filter(
-    (Job)=>
-    Job.category.toLowerCase().includes(category.toLowerCase())&&
-    Job.location.toLowerCase().includes(location.toLowerCase())
-    )
-    setFilterJob(filterData)
-}
+  if(jobData && jobData.length >0){
+      const filterData=jobData.filter(
+        (job)=>{
+          const jobCategory = job.category || '';
+          const jobLocation = job.location || '';
+          return (
+              jobCategory.toLowerCase().includes(category.toLowerCase()) &&
+              jobLocation.toLowerCase().includes(location.toLowerCase())
+          );
+        });
+        setFilterJob(filterData)
+      }
+};
 useEffect(()=>{
-
-  filterJobs(serachCategory,searchLoaction);
-
-},[searchLoaction,serachCategory])
+  filterJobs(searchCategory,searchLoaction);
+},[searchLoaction,searchCategory,jobData]);
 
 
  
@@ -63,7 +71,7 @@ useEffect(()=>{
 <p className='text-center'><i class="bi bi-funnel  text-blue-400"></i> Filter</p>
 <div className='fill flex flex-col ml-2'>
 <label htmlFor="pro">Profile</label>
-<input type="text" id='pro'  value={serachCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
+<input type="text" id='pro'  value={searchCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
 <label htmlFor="loc">Location</label>
 <input type="text" id='loc'  value={searchLoaction}  onChange={handleCategoryLocationChange} className='location border-2  -ml-8 w-full' placeholder='Mumbai'/>
 </div>
@@ -155,7 +163,7 @@ useEffect(()=>{
 <p className='text-center'><i class="bi bi-funnel  text-blue-400"></i> Filter</p>
 <div className='fill flex flex-col ml-2'>
 <label htmlFor="pro">Profile</label>
-<input type="text" id='pro'  value={serachCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
+<input type="text" id='pro'  value={searchCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
 <label htmlFor="loc">Location</label>
 <input type="text" id='loc'  value={searchLoaction}  onChange={handleCategoryLocationChange} className='location border-2 mt-10  -ml-8 w-full' placeholder='Mumbai'/>
 </div>

@@ -52,7 +52,7 @@ function Postinternships() {
           AdditionalInfo:additionalInfo,
   
       }
-  axios.post("https://internshipbackend-vwja.onrender.com/api/internship",bodyJosn).then((res)=>{
+  axios.post("https://backend-internarea-bs4w.onrender.com/api/internship",bodyJosn).then((res)=>{
       console.log(res.data)
     }).catch((err)=>
     console.log(err))
@@ -126,7 +126,7 @@ function Postinternships() {
         <textarea name="additionalInfo" value={additionalInfo} onChange={(e)=>setAdditionalInfo(e.target.value)} class="h-12 w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring"></textarea>
       </div>
 
-     <button  className='hover:bg-blue-600'>Post Job</button>
+     <button  className='hover:bg-blue-600'>Post Internship</button>
     </form>
   </div>
 </div>

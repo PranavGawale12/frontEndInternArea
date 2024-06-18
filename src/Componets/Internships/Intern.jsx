@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 function Intern() {
 
-const [serachCategory,setSearchCategory]=useState("");
+const [searchCategory,setSearchCategory]=useState("");
 const [searchLoaction,setSearchLocation]=useState("")
 const [filterInternship,setFilterInternship]=useState([])
 const [isDivVisible,setDivVisible]=useState(false)
@@ -24,7 +24,7 @@ const [InternData,setInternData]=useState([])
   useEffect(()=>{
     const fetchData= async()=>{
         try {
-        const response= await axios.get(`https://internshipbackend-vwja.onrender.com/api/internship`)
+        const response= await axios.get("https://backend-internarea-bs4w.onrender.com/api/internship")
         setInternData(response.data)
         console.log(response.data)
     } catch (error) {
@@ -38,29 +38,33 @@ fetchData();
   const handleCategoryChange=(e)=>{
     const categeoryValue=e.target.value;
     setSearchCategory(categeoryValue);
-    setFilterInternship([categeoryValue,searchLoaction])
+    //setFilterInternship([categeoryValue,searchLoaction])
+    filterInterships(categeoryValue, searchLoaction)
   }
   
   const handleCategoryLocationChange=(e)=>{
     const loactionValue=e.target.value;
     setSearchLocation(loactionValue);
-    setFilterInternship([serachCategory,loactionValue])
+   // setFilterInternship([searchCategory,loactionValue])
+   filterInterships(searchCategory, loactionValue)
   }
   const filterInterships = (category, location) => {
     if (InternData && InternData.length > 0) {
     
         const filterData = InternData.filter(
-          (internship) =>
-            internship.category.toLowerCase().includes(category.toLowerCase()) &&
-            internship.location.toLowerCase().includes(location.toLowerCase())
-        );
+          (internship) =>{ 
+            return(
+              internship.category.toLowerCase().includes(category.toLowerCase()) &&
+              internship.location.toLowerCase().includes(location.toLowerCase())
+          );
+          });
         setFilterInternship(filterData);
       
     }
   };
   useEffect(() => {
-    filterInterships(serachCategory, searchLoaction);
-  }, [searchLoaction, serachCategory]);
+    filterInterships(searchCategory, searchLoaction);
+  }, [searchLoaction, searchCategory,InternData]);
 console.log(filterInternship)
 
  
@@ -72,7 +76,7 @@ console.log(filterInternship)
 <p id='filter-ico' className=' text-center' ><i onClick={showDiv} class="bi bi-funnel  text-blue-400"></i> Filter</p>
 <div className='fill flex flex-col ml-2'>
 <label htmlFor="pro">Profile</label>
-<input type="text" id='pro'  value={serachCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
+<input type="text" id='pro'  value={searchCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
 <label htmlFor="loc">Location</label>
 <input type="text" id='loc'  value={searchLoaction}  onChange={handleCategoryLocationChange} className='location border-2  -ml-8 w-full' placeholder='Mumbai'/>
 </div>
@@ -158,7 +162,7 @@ console.log(filterInternship)
 <p className='text-center'><i class="bi bi-funnel  text-blue-400"></i> Filter</p>
 <div className='fill flex flex-col ml-2'>
 <label htmlFor="pro">Profile</label>
-<input type="text" id='pro'  value={serachCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
+<input type="text" id='pro'  value={searchCategory} onChange={handleCategoryChange} className='profile border-2 mr-3 w-full' placeholder='Profile manager'/>
 <label htmlFor="loc">Location</label>
 <input type="text" id='loc'  value={searchLoaction}  onChange={handleCategoryLocationChange} className='location border-2 mt-10  -ml-8 w-full' placeholder='Mumbai'/>
 </div>
