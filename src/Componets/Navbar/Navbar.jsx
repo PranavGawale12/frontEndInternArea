@@ -3,11 +3,14 @@ import logo from '../../Assets/logo.png'
 import { Link } from 'react-router-dom'
 import "./navbar.css"
 import Sidebar from './Sidebar'
-import { signInWithPopup, signOut, signInWithEmailAndPassword, signInWithPhoneNumber,RecaptchaVerifier } from 'firebase/auth'
+import { signInWithPopup, signOut, signInWithEmailAndPassword, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth'
 import { auth, provider } from '../../firebase/firebase'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../Feature/Userslice'
 import { useNavigate } from 'react-router-dom'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
+
 function Navbar() {
     const navigate = useNavigate()
     const user = useSelector(selectUser)
@@ -21,6 +24,7 @@ function Navbar() {
     const [phone, setPhone] = useState("")
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [verificationCode, setVerificationCode] = useState('');
+
     const loginFunction = () => {
         signInWithPopup(auth, provider).then((res) => {
             console.log(res)
@@ -31,38 +35,64 @@ function Navbar() {
         setDivVisibleFrologin(false)
     }
 
-    const handleEmailLogin= async(e) =>{
-        e.preventDefault();
-        try{
-          await signInWithEmailAndPassword(auth,email,password);
-          console.log("Login successful");
-          navigate("/");
-        }catch(error){
-          alert('Login Failed');
-        }
-      };
-
-      const handlePhoneSignup = async (e) => {
+    const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-          const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-            'size': 'invisible'
-          }, auth);
-          const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
-          setConfirmationResult(result);
-          alert('SMS sent. Please check your phone.');
+            await signInWithEmailAndPassword(auth, email, password);
+            console.log("Login successful");
+            setDivVisibleFrologin(false)
         } catch (error) {
-          alert("Phone number sign up failed");
+            alert('Login Failed');
         }
-      };
+    };
 
-      const loginCodeVerify = async(e)=>{
+    const setupRecaptcha = () => {
+        if (window.recaptchaVerifier) {
+          window.recaptchaVerifier.clear();
+        }
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible',
+          'callback': (response) => {
+            console.log('reCAPTCHA solved');
+          },
+          'expired-callback': () => {
+            console.log('reCAPTCHA expired, please solve it again.');
+          }
+        });
+    
+      };
+    
+      const handlePhoneSignup = (e) => {
         e.preventDefault();
-        try{
-          await confirmationResult.confirm(verificationCode);
-          navigate("/");
-        }catch(error){
-          alert("Verification code incorrect");
+        const recaptchaContainer = document.getElementById('recaptcha-container');
+        recaptchaContainer.innerHTML = '';
+        setupRecaptcha();
+        const appVerifier = window.recaptchaVerifier;
+    
+        console.log('Phone number:', phone); // Check the value of phone here
+    
+        signInWithPhoneNumber(auth, `+${phone}`, appVerifier)
+          .then((confirmationResult) => {
+            setConfirmationResult(confirmationResult);
+            console.log('SMS sent');
+          })
+          .catch((error) => {
+            console.error('Error during phone signup:', error);
+          });
+      };
+    
+      const loginCodeVerify = async (e) => {
+        e.preventDefault();
+        if (confirmationResult) {
+          confirmationResult.confirm(verificationCode)
+            .then((result) => {
+              const user = result.user;
+              console.log(user);
+              setDivVisibleFrologin(false)
+            })
+            .catch((error)=>{
+                console.error('Code does not match: ',error);
+            })
         }
       };
 
@@ -285,10 +315,18 @@ function Navbar() {
                                                     <span className='border-b w-1/5 lg:w1/4'></span>
                                                 </div>
                                                 <form onSubmit={handlePhoneSignup}>
-                                                    <div class="mt-4">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number </label>
-                                                        <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setPhone(e.target.value)} />
+                                                    <div className="mt-4">
+                                                        <PhoneInput
+                                                            country={'us'}
+                                                            value={phone}
+                                                            onChange={(phone) => {
+                                                                setPhone(phone);
+                                                                console.log('Phone input value:', phone);
+                                                            }
+                                                            }
+                                                        />
                                                     </div>
+                                                    <div id="recaptcha-container"></div>
                                                     <div className="mt-8">
                                                         <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
                                                     </div>
@@ -314,50 +352,58 @@ function Navbar() {
                                 </>
                             ) : (
                                 <>
-                                <div className="flex bg-white rounded-lg justify-center overflow-hidden mx-auto max-w-sm lg:max-w-4xl">
-                                  <div className="w-full p-8 lg:w-1/2">
-                                    <form>
-                                      <div class="mt-4">
-                                        <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
-                                        <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e)=>setEmail(e.target.value)}/>
-                                      </div>
-                                      <div class="mt-4">
-                                        <div class="flex justify-between">
-                                          <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                                          <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                                    <div className="flex bg-white rounded-lg justify-center overflow-hidden mx-auto max-w-sm lg:max-w-4xl">
+                                        <div className="w-full p-8 lg:w-1/2">
+                                            <form>
+                                                <div class="mt-4">
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                                                    <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
+                                                </div>
+                                                <div class="mt-4">
+                                                    <div class="flex justify-between">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                                                        <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                                                    </div>
+                                                    <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
+                                                </div>
+                                                <div className="mt-8">
+                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login</button>
+                                                </div>
+                                            </form>
+                                            <form>
+                                                <div className="mt-4">
+                                                    <PhoneInput
+                                                        country={'us'}
+                                                        value={phone}
+                                                        onChange={(phone) => {
+                                                            setPhone(phone);
+                                                            console.log('Phone input value:', phone);
+                                                        }
+                                                        }
+                                                    />
+                                                </div>
+                                                <div id="recaptcha-container"></div>
+                                                <div className="mt-8">
+                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                </div>
+                                            </form>
+                                            {confirmationResult && (
+                                                <form onSubmit={loginCodeVerify}>
+                                                    <div class="mt-4">
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                                                        <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
+                                                    </div>
+                                                    <div className="mt-8">
+                                                        <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                    </div>
+                                                </form>
+                                            )}
+                                            <div className="mt-4 flex items-center justify-between">
+                                                <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                                            </div>
                                         </div>
-                                        <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"  placeholder='Must be atleast 6 characters' type="password" onChange={(e)=>setPassword(e.target.value)}/>
-                                      </div>
-                                      <div className="mt-8">
-                                        <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login</button>
-                                      </div>
-                                    </form>
-                                    <form>
-                                        <div class="mt-4">
-                                          <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number </label>
-                                          <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setPhone(e.target.value)}/>
-                                        </div>
-                                        <div className="mt-8">
-                                          <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
-                                        </div>
-                                      </form>
-                                      {confirmationResult && (
-                                        <form>
-                                          <div class="mt-4">
-                                            <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
-                                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setVerificationCode(e.target.value)}/>
-                                          </div>
-                                          <div className="mt-8">
-                                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
-                                          </div>
-                                        </form>
-                                      )}
-                                       <div className="mt-4 flex items-center justify-between">
-                                        <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
-                                      </div>
-                                  </div>
-                                </div>
-                              </>
+                                    </div>
+                                </>
                             )
                             }
                         </>

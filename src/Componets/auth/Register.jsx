@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
-import { signInWithPopup, createUserWithEmailAndPassword, signInWithPhoneNumber, RecaptchaVerifier, updateProfile,signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithPopup, createUserWithEmailAndPassword, signInWithPhoneNumber, RecaptchaVerifier, updateProfile, signInWithEmailAndPassword } from 'firebase/auth'
 import './register.css'
 import { auth, provider, phoneProvider } from "../../firebase/firebase"
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import PhoneInput from 'react-phone-input-2'
+import 'react-phone-input-2/lib/style.css'
 
 function Register() {
   const [isStudent, setStudent] = useState(true)
@@ -15,13 +17,12 @@ function Register() {
   const [phone, setPhone] = useState("")
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [verificationCode, setVerificationCode] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   let navigate = useNavigate()
 
   const handleSignin = () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+
     signInWithPopup(auth, provider).then((res) => {
       console.log(res)
       navigate("/")
@@ -29,13 +30,12 @@ function Register() {
       console.log(err)
     })
     toast("Login Success")
-    setIsSubmitting(false);
+
   }
 
   const handleEmailSignup = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -49,66 +49,178 @@ function Register() {
     } catch (error) {
       alert("Signup Failed");
     }
-    setIsSubmitting(false);
+
   }
 
-  const handlePhoneSignup = async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      
-      const recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-        'size': 'invisible'
-      }, auth);
-      const result = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
-      setConfirmationResult(result);
-      alert('SMS sent. Please check your phone.');
-    } catch (error) {
-      console.log(error);
-      alert("Phone number sign up failed");
-      console.log(error);
+  // // const setupRecaptcha = () => {
+  // //   if (!window.recaptchaVerifier) {
+  // //     window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+  // //       // 'size': 'invisible',
+  // //       // 'callback': (response) => {
+  // //       //   console.log('reCAPTCHA solved');
+  // //       // },
+  // //       // 'expired-callback': () => {
+  // //       //   console.log('reCAPTCHA expired, please solve it again.');
+  // //       // }
+  // //     }, auth);
+  // //   }
+  // // };
+  // const handlePhoneSignup = async (e) => {
+  //   e.preventDefault();
+  //   if (isSubmitting) return;
+  //   setIsSubmitting(true);
+  //   try {
+  //     console.log(`+${phone}`);
+  //     const recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha-container',{});
+  //     const result = await signInWithPhoneNumber(auth, `+${phone}`, recaptchaVerifier);
+  //     console.log(result);
+  //     setConfirmationResult(result);
+  //     alert('SMS sent. Please check your phone.');
+  //   } catch (error) {
+  //     console.log(error);
+  //     alert("Phone number sign up failed");
+  //   }
+  //   setIsSubmitting(false);
+  // };
+  // // const handlePhoneSignup = (e) => {
+  // //   e.preventDefault();
+  // //   setupRecaptcha();
+  // //   const appVerifier = window.recaptchaVerifier;
+
+  // //   signInWithPhoneNumber(auth, `+${phone}`, appVerifier)
+  // //     .then((confirmationResult) => {
+  // //       setConfirmationResult(confirmationResult);
+  // //       console.log('SMS sent');
+  // //     })
+  // //     .catch((error) => {
+  // //       console.error('Error during phone signup:', error);
+  // //     });
+  // // };
+
+  // const verifyCode = async (e) => {
+  //   e.preventDefault();
+  //   if (isSubmitting) return;
+  //   setIsSubmitting(true);
+  //   try {
+  //     const userCredential = await confirmationResult.confirm(verificationCode);
+  //     const user = userCredential.user;
+  //     const fullName = `${fname} ${lname}`;
+  //     await updateProfile(user, {
+  //       displayName: fullName
+  //     });
+  //     console.log(user);
+  //     showLogin();
+  //     navigate("/register");
+  //   } catch (error) {
+  //     alert('Verification code incorrect');
+  //   }
+  //   setIsSubmitting(false);
+  // };
+
+  // // const verifyCode = (e) => {
+  // //   e.preventDefault();
+  // //   confirmationResult.confirm(verificationCode)
+  // //     .then((result) => {
+  // //       const user = result.user;
+  // //       const displayName = `${fname} ${lname}`;
+  // //       updateProfile(user, { displayName })
+  // //         .then(() => {
+  // //           console.log('Profile updated');
+  // //           showLogin();
+  // //           navigate("/register");
+  // //         })
+  // //         .catch((error) => {
+  // //           console.error('Error updating profile:', error);
+  // //         });
+  // //     })
+  // //     .catch((error) => {
+  // //       console.error('Error verifying code:', error);
+  // //     });
+  // // };
+
+  const setupRecaptcha = () => {
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
     }
-    setIsSubmitting(false);
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      'size': 'invisible',
+      'callback': (response) => {
+        console.log('reCAPTCHA solved');
+      },
+      'expired-callback': () => {
+        console.log('reCAPTCHA expired, please solve it again.');
+      }
+    });
+
   };
 
-  const verifyCode = async (e) => {
+  const handlePhoneSignup = (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      const userCredential = await confirmationResult.confirm(verificationCode);
-      const user = userCredential.user;
-      const fullName = `${fname} ${lname}`;
-      await updateProfile(user, {
-        displayName: fullName
+    const recaptchaContainer = document.getElementById('recaptcha-container');
+    recaptchaContainer.innerHTML = '';
+    setupRecaptcha();
+    const appVerifier = window.recaptchaVerifier;
+
+    console.log('Phone number:', phone); // Check the value of phone here
+
+    signInWithPhoneNumber(auth, `+${phone}`, appVerifier)
+      .then((confirmationResult) => {
+        setConfirmationResult(confirmationResult);
+        console.log('SMS sent');
+      })
+      .catch((error) => {
+        console.error('Error during phone signup:', error);
       });
-      showLogin();
-      navigate("/register");
-    } catch (error) {
-      alert('Verification code incorrect');
-    }
-    setIsSubmitting(false);
   };
 
-  const handleEmailLogin= async(e) =>{
+  const verifyCode = (e) => {
     e.preventDefault();
-    try{
-      await signInWithEmailAndPassword(auth,email,password);
+    if (confirmationResult) {
+      confirmationResult.confirm(verificationCode)
+        .then((result) => {
+          const user = result.user;
+          const displayName = `${fname} ${lname}`;
+          updateProfile(user, { displayName })
+            .then(() => {
+              console.log('Profile updated');
+              showLogin();
+              navigate("/register");
+              setConfirmationResult(null);
+            })
+            .catch((error) => {
+              console.error('Error updating profile:', error);
+            });
+        })
+        .catch((error) => {
+          console.error('Error verifying code:', error);
+        });
+    } else {
+      console.error('No confirmation result available');
+    }
+  };
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       console.log("Login successful");
       navigate("/");
-    }catch(error){
+    } catch (error) {
       alert('Login Failed');
     }
   };
 
-  const loginCodeVerify = async(e)=>{
+  const loginCodeVerify = async (e) => {
     e.preventDefault();
-    try{
-      await confirmationResult.confirm(verificationCode);
-      navigate("/");
-    }catch(error){
-      alert("Verification code incorrect");
+    if (confirmationResult) {
+      confirmationResult.confirm(verificationCode)
+        .then((result) => {
+          const user = result.user;
+          console.log(user);
+          navigate("/");
+          const recaptchaContainer = document.getElementById('recaptcha-container');
+          recaptchaContainer.innerHTML = '';
+        })
     }
   };
 
@@ -173,7 +285,7 @@ function Register() {
                       <input type="text" className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='Lname' value={lname} onChange={(e) => setLname(e.target.value)} />
                     </div>
                   </div>
-                  <button type="submit" disabled={isSubmitting} className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Signup with Email</button>
+                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Signup with Email</button>
                 </form>
                 <div className="mt-4 flex items-center justify-between">
                   <span className='border-b w-1/5 lg:w1/4'></span>
@@ -181,11 +293,23 @@ function Register() {
                   <span className='border-b w-1/5 lg:w1/4'></span>
                 </div>
                 <form onSubmit={handlePhoneSignup}>
-                  <div className="mt-4">
+                  {/* <div className="mt-4">
                     <label htmlFor="phone" className='border-b text-gray-700 text-sm font-bold mb-2'>Pnone Number</label>
                     <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='phone' />
+                  </div> */}
+                  <div className="mt-4">
+                    <PhoneInput
+                      country={'us'}
+                      value={phone}
+                      onChange={(phone) => {
+                        setPhone(phone);
+                        console.log('Phone input value:', phone);
+                      }
+                      }
+                    />
                   </div>
-                  <button type="submit" disabled={isSubmitting} className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>SignUp with Phone</button>
+                  <div id="recaptcha-container"></div>
+                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>SignUp with Phone</button>
                 </form>
                 {
                   confirmationResult && (
@@ -194,7 +318,7 @@ function Register() {
                         <label htmlFor="verificationCode" className='border-b text-gray-700 text-sm font-bold mb-2'>Verification Code</label>
                         <input type="text" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='verificationCode' />
                       </div>
-                      <button type="submit"  disabled={isSubmitting} className='bg-gray-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Verify Code</button>
+                      <button type="submit"  className='bg-gray-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Verify Code</button>
                     </form>
                   )
                 }
@@ -248,14 +372,14 @@ function Register() {
                         <form onSubmit={handleEmailLogin}>
                           <div class="mt-4">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
-                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e)=>setEmail(e.target.value)} />
+                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                           </div>
                           <div class="mt-4">
                             <div class="flex justify-between">
                               <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
                               <a href="/" class="text-xs text-blue-500">Forget Password?</a>
                             </div>
-                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e)=>setPassword(e.target.value)}/>
+                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                           </div>
                           <div className="mt-8">
                             <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Email</button>
@@ -267,25 +391,35 @@ function Register() {
                           <span className='border-b w-1/5 lg:w1/4'></span>
                         </div>
                         <form onSubmit={handlePhoneSignup}>
-                          <div class="mt-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number </label>
-                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setPhone(e.target.value)}/>
+                          <div className="mt-4">
+                            <PhoneInput
+                              country={'us'}
+                              value={phone}
+                              onChange={(phone) => {
+                                setPhone(phone);
+                                console.log('Phone input value:', phone);
+                              }
+                              }
+                            />
                           </div>
                           <div className="mt-8">
+                            <div id="recaptcha-container"></div>
                             <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
                           </div>
                         </form>
-                        {confirmationResult && (
-                          <form onSubmit={loginCodeVerify}>
-                            <div class="mt-4">
-                              <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
-                              <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setVerificationCode(e.target.value)} />
-                            </div>
-                            <div className="mt-8">
-                              <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
-                            </div>
-                          </form>
-                        )}
+                        {
+                          confirmationResult && (
+                            <form onSubmit={loginCodeVerify}>
+                              <div class="mt-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                                <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
+                              </div>
+                              <div className="mt-8">
+                                <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                              </div>
+                            </form>
+                          )
+                        }
                         <div className="mt-4 flex items-center justify-between">
                           <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
                         </div>
@@ -301,42 +435,50 @@ function Register() {
                       <form>
                         <div class="mt-4">
                           <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
-                          <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e)=>setEmail(e.target.value)}/>
+                          <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div class="mt-4">
                           <div class="flex justify-between">
                             <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
                             <a href="/" class="text-xs text-blue-500">Forget Password?</a>
                           </div>
-                          <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"  placeholder='Must be atleast 6 characters' type="password" onChange={(e)=>setPassword(e.target.value)}/>
+                          <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className="mt-8">
                           <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login</button>
                         </div>
                       </form>
-                      <form>
-                          <div class="mt-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number </label>
-                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setPhone(e.target.value)}/>
+                      <form onSubmit={handlePhoneSignup}>
+                          <div className="mt-4">
+                            <PhoneInput
+                              country={'us'}
+                              value={phone}
+                              onChange={(phone) => {
+                                setPhone(phone);
+                                console.log('Phone input value:', phone);
+                              }
+                              }
+                            />
                           </div>
                           <div className="mt-8">
+                            <div id="recaptcha-container"></div>
                             <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
                           </div>
                         </form>
-                        {confirmationResult && (
-                          <form>
-                            <div class="mt-4">
-                              <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
-                              <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e)=>setVerificationCode(e.target.value)}/>
-                            </div>
-                            <div className="mt-8">
-                              <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
-                            </div>
-                          </form>
-                        )}
-                         <div className="mt-4 flex items-center justify-between">
-                          <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
-                        </div>
+                      {confirmationResult && (
+                        <form onSubmit={loginCodeVerify}>
+                          <div class="mt-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                            <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
+                          </div>
+                          <div className="mt-8">
+                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                          </div>
+                        </form>
+                      )}
+                      <div className="mt-4 flex items-center justify-between">
+                        <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                      </div>
                     </div>
                   </div>
                 </>
