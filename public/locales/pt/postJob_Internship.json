@@ -1,0 +1,20 @@
+{
+    "post_a_internship":"Publicar um estágio",
+    "title":"título*",
+    "company_name":"Nome da empresa*",
+    "location":"Localização",
+    "category":"Categoria*",
+    "aboutCompany":"sobre Empresa*",
+    "aboutInternship":"sobre Estágio*",
+    "whocanapply": "quem pode se inscrever*",
+    "perks":"vantagens*",
+    "numberOfOpening":"Número de aberturas*",
+    "stipend":"bolsa*",
+    "start_date":"Data de início*",
+    "additional_info":"Informações Adicionais*",
+    "post_internship":"Pós-estágio",
+    "post_a_job":"Publicar uma vaga",
+    "aboutJob":"sobre Job**",
+    "CTC":"salarial*",
+    "post_job":"Pós-trabalho"
+}

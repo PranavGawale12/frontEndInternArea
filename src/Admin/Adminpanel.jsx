@@ -2,12 +2,14 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { RiSendPlaneFill } from "react-icons/ri";
 import { BsMailbox2Flag } from "react-icons/bs";
+import { useTranslation } from 'react-i18next';
+
 function Adminpanel() {
+   
+  const { t } = useTranslation(['admin'])
+
   return (
     <div>
-    
-
-
       <div class="hidden w-full overflow-hidden rounded-lg border bg-gray-50 shadow-sm lg:block">
       <div class="mx-auto flex max-w-screen-lg items-center gap-8 p-8">
         <div class="grid w-2/3 grid-cols-2 gap-8">
@@ -17,8 +19,8 @@ function Adminpanel() {
             </div>
 
             <div>
-              <div class="mb-1 font-semibold">View Applications</div>
-              <p class="text-sm text-gray-500">View All the Applications That you got from applicants</p>
+              <div class="mb-1 font-semibold">{t('admin:view_applications')}</div>
+              <p class="text-sm text-gray-500">{t('admin:view_all')}</p>
             </div>
           </Link>
 
@@ -28,8 +30,8 @@ function Adminpanel() {
             </div>
 
             <div>
-              <div class="mb-1 font-semibold">Post Job</div>
-              <p class="text-sm text-gray-500">Post Jobs According to Your Requirements</p>
+              <div class="mb-1 font-semibold">{t('admin:post_job')}</div>
+              <p class="text-sm text-gray-500">{t('admin:post_job_requirements')}</p>
             </div>
           </Link>
 
@@ -38,8 +40,8 @@ function Adminpanel() {
             <RiSendPlaneFill />
             </div>
             <div>
-              <div class="mb-1 font-semibold">Post InternShips</div>
-              <p class="text-sm text-gray-500">Post InternShip According To Your Requirements </p>
+              <div class="mb-1 font-semibold">{t('admin:post_internship')}</div>
+              <p class="text-sm text-gray-500">{t('admin:post_intenship_requirements')} </p>
             </div>
           </Link>
 

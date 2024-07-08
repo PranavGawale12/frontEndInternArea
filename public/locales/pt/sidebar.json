@@ -1,0 +1,15 @@
+{
+    "profile_name":"Nome do perfil",
+    "internships":"estágios",
+    "Jobs":"Empregos",
+    "contact_us":"Contate-nos",
+    "my_applications":"Meus Aplicativos",
+    "view_resume":"Ver currículo",
+    "more":"mais",
+    "logout":"Sair",
+    "register_student":"Registrar- Como Estudante",
+    "register_employer":"Registrar- Como Empregador",
+    "admin":"Login de administrador",
+    "register":"Registrar",
+    "hire_talent":"Contratar talentos"
+}

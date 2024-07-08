@@ -1,0 +1,19 @@
+{
+    "company_name":"Company name",
+    "cover_letter":"Cover Letter",
+    "date":"Application Date",
+    "applied_by":"Applied By",
+    "total_applications":"Total Applications",
+    "company":"Company",
+    "category":"Category",
+    "applied_on":"Applied On",
+    "view_detail":"View Detail",
+    "application_status":"Application Status",
+    "view_all_applications":"View All Applications",
+    "view_in_detail":"View in detail",
+    "accept":"Accept",
+    "reject":"Reject",
+    "UID":"UID",
+    "email":"Email",
+    "view_applications":"View Applications"
+}

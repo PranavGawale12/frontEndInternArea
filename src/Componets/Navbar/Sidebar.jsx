@@ -6,9 +6,12 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../../Feature/Userslice';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
+import { useTranslation } from 'react-i18next'
 
 function Sidebar() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { t } = useTranslation(['sidebar']);
+    
 const navigate=useNavigate()
   const openSidebar = () => {
     setSidebarOpen(true);
@@ -53,7 +56,7 @@ const navigate=useNavigate()
    <Link to={"/profile"}>
    <img className='rounded-full justify-center' src={user.photo} alt="" srcset="" />
    </Link> 
-    <p className=' text-center'>Profile name <span className='font-bold text-blue-500'>{user?.name}</span></p>
+    <p className=' text-center'>{t('sidebar:profile_name')}<span className='font-bold text-blue-500'>{user?.name}</span></p>
   </div>
   </>
 ):
@@ -65,10 +68,10 @@ const navigate=useNavigate()
 </div>
   ) 
 }
-          <Link to="/internship">internships </Link>
-    <Link to="/Jobs">Jobs  </Link>
+          <Link to="/internship">{t('sidebar:internships')} </Link>
+    <Link to="/Jobs">{t('sidebar:Jobs')} </Link>
        
-       <Link to={"/"} className='small'>contact Us</Link> 
+       <Link to={"/"} className='small'>{t('sidebar:contact_us')}</Link> 
 <hr />
 {user?(
   <>
@@ -76,11 +79,11 @@ const navigate=useNavigate()
     
     {user?(
   <Link to={"/userapplication"}>
-  <p>My Applications</p>
+  <p>{t('sidebar:my_applications')}</p>
   </Link>
     ):(
       <Link to={"/register"}>
-      <p>My Applications</p>
+      <p>{t('sidebar:my_applications')}</p>
       </Link>
     )
 
@@ -88,15 +91,15 @@ const navigate=useNavigate()
 
   <Link>
   
-  <p>View Resume</p>
+  <p>{t('sidebar:view_resume')}</p>
   </Link>
   <Link>
-  <p>More</p>
+  <p>{t('sidebar:more')}</p>
   </Link>
-  <button className='bt-log' id='bt' onClick={logoutFunction}>Logout <i class="bi bi-box-arrow-right"></i></button>
+  <button className='bt-log' id='bt' onClick={logoutFunction}>{t('sidebar:logout')} <i class="bi bi-box-arrow-right"></i></button>
   <br />
   <br />
-<button onClick={logoutFunction}>Log Out <i class="bi bi-box-arrow-right"></i></button>
+<button onClick={logoutFunction}>{t('sidebar:logout')} <i class="bi bi-box-arrow-right"></i></button>
   
   </div>
   </>
@@ -105,8 +108,8 @@ const navigate=useNavigate()
 
   
   <div className="addmore">
-  <p>Register- As a Student</p>
-  <p>Register- As a Employer</p>
+  <p>{t('sidebar:register_student')}</p>
+  <p>{t('sidebar:register_employer')}</p>
   <br />
   <br />
 
@@ -140,12 +143,12 @@ const navigate=useNavigate()
   <div className="reg">
     
   <Link to="/register" >   <button  className='btn4'>
-  Register</button></Link>
+  {t('sidebar:register')}</button></Link>
   </div>
   <div className="admin">
 
 <Link to={"/adminLog"}>
-<button id='admin'> Admin Login</button>
+<button id='admin'> {t('sidebar:admin')}</button>
 </Link>
 </div>
   </>
@@ -156,7 +159,7 @@ const navigate=useNavigate()
 }
 
 
-<p className='text-red-300'>Hire Talent</p>
+<p className='text-red-300'>{t('sidebar:hire_talent')}</p>
 
       </div>
     </>

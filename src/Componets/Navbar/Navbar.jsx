@@ -8,10 +8,14 @@ import { auth, provider } from '../../firebase/firebase'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../Feature/Userslice'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import PhoneInput from 'react-phone-input-2'
+import uaParser from 'ua-parser-js'
 import 'react-phone-input-2/lib/style.css'
+import axios from 'axios'
 
-function Navbar() {
+const Navbar = ({ onLanguageChange }) => {
+    const { i18n } = useTranslation();
     const navigate = useNavigate()
     const user = useSelector(selectUser)
     const [isDivVisibleForintern, setDivVisibleForintern] = useState(false)
@@ -24,10 +28,33 @@ function Navbar() {
     const [phone, setPhone] = useState("")
     const [confirmationResult, setConfirmationResult] = useState(null);
     const [verificationCode, setVerificationCode] = useState('');
+    const { t } = useTranslation(['navbar']);
+
+    const handleLanguageChange = (event) => {
+        const newLang = event.target.value;
+        i18n.changeLanguage(newLang);
+        onLanguageChange(newLang);
+    };
 
     const loginFunction = () => {
-        signInWithPopup(auth, provider).then((res) => {
+        signInWithPopup(auth, provider).then(async (res) => {
             console.log(res)
+            const user = res.user;
+
+            const userAgent = navigator.userAgent;
+            const parseUA = uaParser(userAgent);
+            const browserName = parseUA.browser.name;
+            const osName = parseUA.os.name;
+            const deviceType = parseUA.device.type || 'desktop';
+            const ipAddress = await getIpAddress();
+
+            await axios.post('http://localhost:5000/api/login-history', {
+                userId: user.uid,
+                browser: browserName,
+                os: osName,
+                deviceType: deviceType,
+                ipAddress: ipAddress,
+            });
 
         }).catch((err) => {
             console.log(err)
@@ -35,11 +62,31 @@ function Navbar() {
         setDivVisibleFrologin(false)
     }
 
+    const getIpAddress = async () => {
+        const response = await axios.get('https://api.ipify.org?format=json')
+    }
+
     const handleEmailLogin = async (e) => {
         e.preventDefault();
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const res= await signInWithEmailAndPassword(auth, email, password);
+            const user = res.user;
+
             console.log("Login successful");
+            const userAgent = navigator.userAgent;
+            const parseUA = uaParser(userAgent);
+            const browserName = parseUA.browser.name;
+            const osName = parseUA.os.name;
+            const deviceType = parseUA.device.type || 'desktop';
+            const ipAddress = await getIpAddress();
+
+            await axios.post('http://localhost:5000/api/login-history', {
+                userId: user.uid,
+                browser: browserName,
+                os: osName,
+                deviceType: deviceType,
+                ipAddress: ipAddress,
+            });
             setDivVisibleFrologin(false)
         } catch (error) {
             alert('Login Failed');
@@ -48,53 +95,68 @@ function Navbar() {
 
     const setupRecaptcha = () => {
         if (window.recaptchaVerifier) {
-          window.recaptchaVerifier.clear();
+            window.recaptchaVerifier.clear();
         }
         window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          'size': 'invisible',
-          'callback': (response) => {
-            console.log('reCAPTCHA solved');
-          },
-          'expired-callback': () => {
-            console.log('reCAPTCHA expired, please solve it again.');
-          }
+            'size': 'invisible',
+            'callback': (response) => {
+                console.log('reCAPTCHA solved');
+            },
+            'expired-callback': () => {
+                console.log('reCAPTCHA expired, please solve it again.');
+            }
         });
-    
-      };
-    
-      const handlePhoneSignup = (e) => {
+
+    };
+
+    const handlePhoneSignup = (e) => {
         e.preventDefault();
         const recaptchaContainer = document.getElementById('recaptcha-container');
         recaptchaContainer.innerHTML = '';
         setupRecaptcha();
         const appVerifier = window.recaptchaVerifier;
-    
+
         console.log('Phone number:', phone); // Check the value of phone here
-    
+
         signInWithPhoneNumber(auth, `+${phone}`, appVerifier)
-          .then((confirmationResult) => {
-            setConfirmationResult(confirmationResult);
-            console.log('SMS sent');
-          })
-          .catch((error) => {
-            console.error('Error during phone signup:', error);
-          });
-      };
-    
-      const loginCodeVerify = async (e) => {
+            .then((confirmationResult) => {
+                setConfirmationResult(confirmationResult);
+                console.log('SMS sent');
+            })
+            .catch((error) => {
+                console.error('Error during phone signup:', error);
+            });
+    };
+
+    const loginCodeVerify = async (e) => {
         e.preventDefault();
         if (confirmationResult) {
-          confirmationResult.confirm(verificationCode)
-            .then((result) => {
-              const user = result.user;
-              console.log(user);
-              setDivVisibleFrologin(false)
-            })
-            .catch((error)=>{
-                console.error('Code does not match: ',error);
-            })
+            confirmationResult.confirm(verificationCode)
+                .then(async (result) => {
+                    const user = result.user;
+                    console.log(user);
+                    const userAgent = navigator.userAgent;
+                    const parseUA = uaParser(userAgent);
+                    const browserName = parseUA.browser.name;
+                    const osName = parseUA.os.name;
+                    const deviceType = parseUA.device.type || 'desktop';
+                    const ipAddress = await getIpAddress();
+
+                    await axios.post('http://localhost:5000/api/login-history', {
+                        userId: user.uid,
+                        browser: browserName,
+                        os: osName,
+                        deviceType: deviceType,
+                        ipAddress: ipAddress,
+                    });
+
+                    setDivVisibleFrologin(false)
+                })
+                .catch((error) => {
+                    console.error('Code does not match: ', error);
+                })
         }
-      };
+    };
 
     const showLogin = () => {
         setDivVisibleFrologin(true)
@@ -150,8 +212,18 @@ function Navbar() {
                         <Link to={"/"}><img src={logo} alt="" srcset="" /></Link>
                     </div>
                     <div className="elem">
-                        <Link to={"/Internship"}>   <p id='int' className='' onMouseEnter={showInternShips} > Internships  <i onClick={hideInternShips} id='ico' class="bi bi-caret-down-fill"></i></p></Link>
-                        <Link to={"/Jobs"}> <p onMouseEnter={showJobs} >Jobs  <i class="bi bi-caret-down-fill" id='ico2' onClick={hideJobs}></i></p></Link>
+                        <Link to={"/Internship"}>   <p id='int' className='' onMouseEnter={showInternShips} > {t('navbar:internships')} <i onClick={hideInternShips} id='ico' class="bi bi-caret-down-fill"></i></p></Link>
+                        <Link to={"/Jobs"}> <p onMouseEnter={showJobs} >{t('navbar:jobs')}  <i class="bi bi-caret-down-fill" id='ico2' onClick={hideJobs}></i></p></Link>
+                    </div>
+                    <div className='lang'>
+                        <select onChange={handleLanguageChange} value={i18n.language}>
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                            <option value="es">Español</option>
+                            <option value="hi">हिंदी</option>
+                            <option value="pt">Português</option>
+                            <option value="zh">中文</option>
+                        </select>
                     </div>
                     <div className="search">
                         <i class="bi bi-search"></i>
@@ -170,10 +242,10 @@ function Navbar() {
                         ) : (
                             <>
                                 <div className="auth">
-                                    <button className='btn1' onClick={showLogin}>Login</button>
+                                    <button className='btn1' onClick={showLogin}>{t('navbar:login')}</button>
 
 
-                                    <button className='btn2'><Link to="/register">Register</Link></button>
+                                    <button className='btn2'><Link to="/register">{t('navbar:register')}</Link></button>
                                 </div>
                             </>
                         )
@@ -183,17 +255,17 @@ function Navbar() {
                     {
                         user ? (
                             <>
-                                <button className='bt-log' id='bt' onClick={logoutFunction}>Logout <i class="bi bi-box-arrow-right"></i></button>
+                                <button className='bt-log' id='bt' onClick={logoutFunction}>{t('navbar:logout')} <i class="bi bi-box-arrow-right"></i></button>
                             </>
                         ) : (
                             <>
                                 <div className="flex mt-7 hire">
-                                    Hire Talent
+                                    {t('navbar:hire_talent')}
                                 </div>
 
                                 <div className="admin">
                                     < Link to={"/adminLogin"}>
-                                        <button>Admin</button>  </Link>
+                                        <button>{t('navbar:admin')}</button>  </Link>
                                 </div>
                             </>
                         )
@@ -208,20 +280,20 @@ function Navbar() {
                     <div className="profile-dropdown-2">
                         <div className="left-section">
 
-                            <p>Top Locations</p>
-                            <p>Profile</p>
-                            <p>Top Category</p>
-                            <p>Explore More Internships</p>
+                            <p>{t('navbar:locations')}</p>
+                            <p>{t('navbar:profile')}</p>
+                            <p>{t('navbar:category')}</p>
+                            <p>{t('navbar:explore')}</p>
                         </div>
                         <div className="line flex bg-slate-400">
 
                         </div>
                         <div className="right-section">
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
                         </div>
                     </div>
 
@@ -233,20 +305,20 @@ function Navbar() {
                     <div className="profile-dropdown-1">
                         <div className="left-section">
 
-                            <p>Top Locations</p>
-                            <p>Profile</p>
-                            <p>Top Category</p>
-                            <p>Explore More Internships</p>
+                            <p>{t('navbar:locations')}</p>
+                            <p>{t('navbar:profile')}</p>
+                            <p>{t('navbar:category')}</p>
+                            <p>{t('navbar:explore')}</p>
                         </div>
                         <div className="line flex bg-slate-400">
 
                         </div>
                         <div className="right-section">
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
-                            <p>Intern at India</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
+                            <p>{t('navbar:intern_at_india')}</p>
                         </div>
                     </div>
 
@@ -260,11 +332,11 @@ function Navbar() {
                             <button id='cross' onClick={closeLogin}><i class="bi bi-x"></i></button>
                             <h5 id='state' className='mb-4 justify-center text-center'>
                                 <span id='Sign-in' style={{ cursor: "pointer" }} className={`auth-tab ${isStudent ? 'active' : ""}`} onClick={setFalseForStudent}>
-                                    Student
+                                    <p>{t('navbar:student')}</p>
                                 </span>
                                 &nbsp;     &nbsp; &nbsp;    &nbsp;    &nbsp;    &nbsp;    &nbsp;
                                 <span id='join-in' style={{ cursor: "pointer" }} className={`auth-tab ${isStudent ? 'active' : ""}`} onClick={setTrueForStudent}>
-                                    Employee andT&P
+                                    <p>{t('navbar:employee')}</p>
                                 </span>
                             </h5>
                             {isStudent ? (
@@ -284,34 +356,34 @@ function Navbar() {
                                                             <path d="M36.3425 16.7358H35V16.6667H20V23.3333H29.4192C28.7592 25.1975 27.56 26.805 26.0133 27.9758C26.0142 27.975 26.015 27.975 26.0158 27.9742L31.1742 32.3392C30.8092 32.6708 36.6667 28.3333 36.6667 20C36.6667 18.8825 36.5517 17.7917 36.3425 16.7358Z" fill="#1976D2" />
                                                         </svg>
                                                     </div>
-                                                    <h4 className='text-gray-500'>Login With Google
+                                                    <h4 className='text-gray-500'><p>{t('navbar:login_with_google')}</p>
                                                     </h4>
                                                 </p>
                                                 <div className="mt-4 flex items-center justify-between">
                                                     <span className='border-b- w-1/5 lg:w-1/4'></span>
-                                                    <p className='text-gray-500 text sm font-bold mb-2'> or</p>
+                                                    <p className='text-gray-500 text sm font-bold mb-2'> <p>{t('navbar:or')}</p></p>
                                                     <span className='border-b- w-1/5 lg:w-1/4'></span>
 
                                                 </div>
                                                 <form onSubmit={handleEmailLogin}>
                                                     <div class="mt-4">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:email')} </label>
                                                         <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                                                     </div>
                                                     <div class="mt-4">
                                                         <div class="flex justify-between">
-                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                                                            <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:password')}</label>
+                                                            <a href="/" class="text-xs text-blue-500">{t('navbar:forget_password')}</a>
                                                         </div>
                                                         <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                                                     </div>
                                                     <div className="mt-8">
-                                                        <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Email</button>
+                                                        <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:login_with_email')}</button>
                                                     </div>
                                                 </form>
                                                 <div className="mt-4 flex items-center justify-between">
                                                     <span className='border-b w-1/5 lg:w1/4'></span>
-                                                    <p className='text-xs text-center text-gray-500 uppercase'>or</p>
+                                                    <p className='text-xs text-center text-gray-500 uppercase'>{t('navbar:or')}</p>
                                                     <span className='border-b w-1/5 lg:w1/4'></span>
                                                 </div>
                                                 <form onSubmit={handlePhoneSignup}>
@@ -328,22 +400,22 @@ function Navbar() {
                                                     </div>
                                                     <div id="recaptcha-container"></div>
                                                     <div className="mt-8">
-                                                        <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                        <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:login_with_phone')}</button>
                                                     </div>
                                                 </form>
                                                 {confirmationResult && (
                                                     <form onSubmit={loginCodeVerify}>
                                                         <div class="mt-4">
-                                                            <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                                                            <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:verification')}</label>
                                                             <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
                                                         </div>
                                                         <div className="mt-8">
-                                                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:verify')}</button>
                                                         </div>
                                                     </form>
                                                 )}
                                                 <div className="mt-4 flex items-center justify-between">
-                                                    <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                                                    <p className='text-sm'>{t('navbar:new_register')}(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('navbar:student')}</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('navbar:company')}</span>) </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -356,18 +428,18 @@ function Navbar() {
                                         <div className="w-full p-8 lg:w-1/2">
                                             <form>
                                                 <div class="mt-4">
-                                                    <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                                                    <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:email')} </label>
                                                     <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                                                 </div>
                                                 <div class="mt-4">
                                                     <div class="flex justify-between">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                                                        <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:password')}</label>
+                                                        <a href="/" class="text-xs text-blue-500">{t('navbar:forget_password')}</a>
                                                     </div>
                                                     <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                                                 </div>
                                                 <div className="mt-8">
-                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login</button>
+                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:login')}</button>
                                                 </div>
                                             </form>
                                             <form>
@@ -384,22 +456,22 @@ function Navbar() {
                                                 </div>
                                                 <div id="recaptcha-container"></div>
                                                 <div className="mt-8">
-                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                    <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:login_with_phone')}</button>
                                                 </div>
                                             </form>
                                             {confirmationResult && (
                                                 <form onSubmit={loginCodeVerify}>
                                                     <div class="mt-4">
-                                                        <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                                                        <label class="block text-gray-700 text-sm font-bold mb-2">{t('navbar:verification')}</label>
                                                         <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
                                                     </div>
                                                     <div className="mt-8">
-                                                        <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                                        <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('navbar:verify')}</button>
                                                     </div>
                                                 </form>
                                             )}
                                             <div className="mt-4 flex items-center justify-between">
-                                                <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                                                <p className='text-sm'>{t('navbar:new_register')}(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('navbar:student')}</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('navbar:company')}</span>) </p>
                                             </div>
                                         </div>
                                     </div>
@@ -422,6 +494,6 @@ function Navbar() {
             <Sidebar />
         </div>
     )
-}
+};
 
 export default Navbar

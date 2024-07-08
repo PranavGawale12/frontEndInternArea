@@ -1,0 +1,20 @@
+{
+    "post_a_internship":"Publicar una pasantía",
+    "title":"título*",
+    "company_name":"Nombre de la empresa*",
+    "location":"Ubicación",
+    "category":"Categoría*",
+    "aboutCompany":"acerca de la empresa*",
+    "aboutInternship":"acerca de la pasantía*",
+    "whocanapply": "quién puede postularse*",
+    "perks":"beneficios*",
+    "numberOfOpening":"Número de aperturas*",
+    "stipend":"estipendio*",
+    "start_date":"Fecha de inicio*",
+    "additional_info":"Información adicional*",
+    "post_internship":"Post pasantía",
+    "post_a_job":"Publicar un trabajo",
+    "aboutJob":"acerca del trabajo*",
+    "CTC":"CTC*",
+    "post_job":"Publicar trabajo"
+}

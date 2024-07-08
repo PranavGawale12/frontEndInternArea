@@ -1,0 +1,20 @@
+{
+    "post_a_internship":"Publier un stage",
+    "title":"titre*",
+    "company_name":"Nom de l'entreprise*",
+    "location":"Emplacement",
+    "category":"Catégorie*",
+    "aboutCompany":"à propos de l'entreprise*",
+    "aboutInternship":"à propos du stage*",
+    "whocanapply": "qui peut postuler*",
+    "perks":"Avantages*",
+    "numberOfOpening":"Nombre d'ouverture*",
+    "stipend":"allocation*",
+    "start_date":"Date de début*",
+    "additional_info":"Informations supplémentaires*",
+    "post_internship":"Après le stage",
+    "post_a_job":"Publier une offre d'emploi",
+    "aboutJob":"à propos du travail*",
+    "CTC":"CTC*",
+    "post_job":"Publier le travail"
+}

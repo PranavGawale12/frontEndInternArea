@@ -1,0 +1,20 @@
+{
+    "post_a_internship":"發布實習",
+    "title":"標題*",
+    "company_name":"公司名稱*",
+    "location":"位置",
+    "category":"類別*",
+    "aboutCompany":"關於公司*",
+    "aboutInternship":"關於實習*",
+    "whocanapply": "誰可以申請*",
+    "perks":"福利*",
+    "numberOfOpening":"開倉數量*",
+    "stipend":"津貼*",
+    "start_date":"開始日期*",
+    "additional_info":"附加資訊*",
+    "post_internship":"實習後",
+    "post_a_job":"發布職缺",
+    "aboutJob":"關於工作*",
+    "CTC":"包裹*",
+    "post_job":"發布工作"
+}

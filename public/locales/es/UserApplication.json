@@ -1,0 +1,19 @@
+{
+    "company_name":"Nombre de la empresa",
+    "cover_letter":"Carta de presentación",
+    "date":"Fecha de solicitud",
+    "applied_by":"Aplicado por",
+    "total_applications":"Aplicaciones totales",
+    "company":"Empresa",
+    "category":"Categoría",
+    "applied_on":"Aplicado el",
+    "view_detail":"Ver Detalles",
+    "application_status":"Estado de la solicitud",
+    "view_all_applications":"Ver todas las aplicaciones",
+    "view_in_detail":"Ver en detalle",
+    "accept":"Aceptar",
+    "reject":"Rechazar",
+    "UID":"Identificación de usuario",
+    "email":"correo electrónico",
+    "view_applications":"Ver aplicaciones"
+}

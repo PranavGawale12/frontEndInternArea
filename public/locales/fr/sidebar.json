@@ -1,0 +1,15 @@
+{
+    "profile_name":"Nom du profil",
+    "internships":"stages",
+    "Jobs":"Emplois",
+    "contact_us":"contactez-nous",
+    "my_applications":"Mes applications",
+    "view_resume":"Afficher le CV",
+    "more":"Plus",
+    "logout":"Déconnexion",
+    "register_student":"S'inscrire - En tant qu'étudiant",
+    "register_employer":"S'inscrire - En tant qu'employeur",
+    "admin":"Connexion administrateur",
+    "register":"S'inscrire",
+    "hire_talent":"Recruter des talents"
+}

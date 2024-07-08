@@ -1,0 +1,19 @@
+{
+    "company_name":"公司名稱",
+    "cover_letter":"求職信",
+    "date":"申請日期",
+    "applied_by":"應用程式",
+    "total_applications":"應用程式總數",
+    "company":"公司",
+    "category":"類別",
+    "applied_on":"應用於",
+    "view_detail":"查看詳細資料",
+    "application_status":"應用程式狀態",
+    "view_all_applications":"查看所有應用程式",
+    "view_in_detail":"詳細查看",
+    "accept":"接受",
+    "reject":"拒絕",
+    "UID":"用户身份",
+    "email":"電子郵件",
+    "view_applications":"檢視應用程式"
+}

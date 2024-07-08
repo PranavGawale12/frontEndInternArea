@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { selectUser } from '../../Feature/Userslice'
 import { useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
+import { Await, Link, useNavigate } from 'react-router-dom'
 import "./job.css"
 import axios from 'axios'
-
+import { useTranslation } from 'react-i18next'
 
 function JobDetail() {
   const user=useSelector(selectUser)
@@ -12,11 +12,13 @@ function JobDetail() {
   const [textarea,setTextare]=useState("")
   const [company,setCompany]=useState("")
   const [category,setCategory]=useState("")
+  const { t } = useTranslation(['intern_jobDetail'])
 const navigate=useNavigate();
   let search=window.location.search;
   const params=new URLSearchParams(search);
 const id=params.get("q")
   const [data,setData] =useState([])
+  
 useEffect(()=>{
    const fetchData= async()=>{
   const response=await axios.get(`https://backend-internarea-bs4w.onrender.com/api/job/${id}`)
@@ -28,6 +30,9 @@ useEffect(()=>{
    }
    fetchData()
 })
+
+
+
   const show=()=>{
     setDivVisible(true)
 }
@@ -68,7 +73,7 @@ const text=document.getElementById("text")
 
           <h1 className='font-bold text-3xl'>{data.title}</h1>
           <div className="m-14 shadow-sm rounded-md border">
-          <p className='mb-4 mt-3' id='boxer'> <i className='bi bi-arrow-up-right text-blue-500' ></i> Actively Hiring</p>
+          <p className='mb-4 mt-3' id='boxer'> <i className='bi bi-arrow-up-right text-blue-500' ></i>{t('intern_jobDetail:actively_hiring')}</p>
           <div className="main-info align-baseline mr-96 mt-7">
 
 
@@ -77,49 +82,49 @@ const text=document.getElementById("text")
  <p> <i class="bi bi-geo-alt-fill"></i> {data.location}</p>
  </div>
  <div className="flex tedxt-sm justify-between">
-  <p className='mt-3 text-slate-400'> <i class="bi bi-play-circle-fill"></i>   Start Date  <br />  {data.StartDate}</p>
+  <p className='mt-3 text-slate-400'> <i class="bi bi-play-circle-fill"></i>   {t('intern_jobDetail:start_date')} <br />  {data.StartDate}</p>
 
 
-  <p className='mt-3 text-slate-400' > <i class="bi bi-calendar-check-fill"></i>  Experience  <br />
+  <p className='mt-3 text-slate-400' > <i class="bi bi-calendar-check-fill"></i>  {t('intern_jobDetail:experience')}  <br />
   {data.Experience}</p>
 
-  <p className='mt-3 text-slate-400'>  <i class="bi bi-cash"></i>   Salary <br /> {data.CTC}</p>
+  <p className='mt-3 text-slate-400'>  <i class="bi bi-cash"></i>   {t('intern_jobDetail:salary')} <br /> {data.CTC}</p>
    </div>
    <div className="flex">
     <p className='bg-green-100 rounded-md ml-4 text-green-300'> <i class="bi bi-clock"></i> 12/12/2012</p>
    </div>
    <hr />
    <div className="aboutCompany flex justify-start">
-<p className='mt-3 text-xl font-bold text-start'> About {data.company}</p>
+<p className='mt-3 text-xl font-bold text-start'> {t('intern_jobDetail:about')} {data.company}</p>
 <br />
    </div>
 <div className="flex">
 
- <p className='text-blue-500'> instagram page  <i className='bi bi-arrow-up-right-square'></i></p>
+ <p className='text-blue-500'> {t('intern_jobDetail:instagram')}  <i className='bi bi-arrow-up-right-square'></i></p>
 
 </div>
  <p className='mt-4'> {data.aboutCompany}</p>
           <div className="about-Job">
-          <p className='mt-3 text-xl font-bold text-start'> about Job</p>
+          <p className='mt-3 text-xl font-bold text-start'> {t('intern_jobDetail:about_Job')}</p>
           <p>{data.aboutJob}</p>
           </div>
-          <p className='text-blue-500 justify-start'> Learn Business Communication</p>
+          <p className='text-blue-500 justify-start'> {t('intern_jobDetail:learn_business')}</p>
 
           <div className="whocan">
-          <p className='mt-3 text-xl font-bold text-start'>Who can apply</p>
+          <p className='mt-3 text-xl font-bold text-start'>{t('intern_jobDetail:who_can_apply')}</p>
           <p>{data.Whocanapply}</p>
           </div>
 
-          <p className='mt-3 text-xl font-bold text-start'>Perks</p>
+          <p className='mt-3 text-xl font-bold text-start'>{t('intern_jobDetail:perks')}</p>
           <p>{data.perks}</p>
           
-          <p className='mt-3 text-xl font-bold text-start'> Additional information</p>
+          <p className='mt-3 text-xl font-bold text-start'> {t('intern_jobDetail:additional_information')}</p>
           <p>{data.AdditionalInfo}</p>
 
-          <p className='mt-3 text-xl font-bold text-start'> Number of opening</p>
+          <p className='mt-3 text-xl font-bold text-start'> {t('intern_jobDetail:number_of_opening')}</p>
           <p className='text-start'>{data.numberOfopning}</p>
           <div className='flex justify-center mt-6 bg-blue-500 w-40 text-center text-white font-bold '>
-          <button className='flex justify-center align-middle' onClick={show}>Apply</button>
+          <button className='flex justify-center align-middle' onClick={show}>{t('intern_jobDetail:apply')}</button>
 
           </div>
      
@@ -131,21 +136,21 @@ const text=document.getElementById("text")
   <>
   <div className="application-page">
     <div className="bg">
-      <button className='close2' onClick={hide} ><i className='bi-bi-x'></i> Close</button>
-      <p>Applyion for Company {data.company}</p>
+      <button className='close2' onClick={hide} ><i className='bi-bi-x'></i> {t('intern_jobDetail:close')}</button>
+      <p>{t('intern_jobDetail:applying_for')} {data.company}</p>
       <p className='mt-3 text-sm font-bold text-start mb-3'>{data.aboutCompany}</p>
 
     </div>
     <div className="moreSteps">
-      <p className='font-semibold text-xl'>Your resume</p>
-      <small>your current resume will be submitted along with the application</small>
+      <p className='font-semibold text-xl'>{t('intern_jobDetail:resume')}</p>
+      <small>{t('intern_jobDetail:resume_submitted')}</small>
 
-      <p className='mt-5 font-semibold text-xl'>Cover letter</p>
+      <p className='mt-5 font-semibold text-xl'>{t('intern_jobDetail:cover_letter')}</p>
       <br />
-      <p>why should we hire for this role?</p>
+      <p>{t('intern_jobDetail:question')}</p>
       <textarea name="coverLetter" placeholder='' id="text"  value={textarea} onChange={(e)=>setTextare(e.target.value)}></textarea>
-      <p className='mt-5 font-semibold text-xl'>your availiblity</p>
-      <p>confirme your availiblity</p>
+      <p className='mt-5 font-semibold text-xl'>{t('intern_jobDetail:your_availiblity')}</p>
+      <p>{t('intern_jobDetail:confirm_your_availiblity')}</p>
 
     </div>
     <div>
@@ -156,7 +161,7 @@ const text=document.getElementById("text")
            
           
           />
-          Yes, I am available to join immediately
+          {t('intern_jobDetail:immediately')} 
         </label>
       </div>
 
@@ -168,7 +173,7 @@ const text=document.getElementById("text")
            
           
           />
-          No, I am currently on notice period
+          {t('intern_jobDetail:notice_period')} 
         </label>
       </div>
 
@@ -180,7 +185,7 @@ const text=document.getElementById("text")
           
            
           />
-          No, I will have to serve notice period
+          {t('intern_jobDetail:serve_notice_period')} 
         </label>
       </div>
 
@@ -192,20 +197,20 @@ const text=document.getElementById("text")
             
        
           />
-          Other <span className='text-slate-500'>
-          (Please specify your availability)  </span> 
+          {t('intern_jobDetail:Other')}  <span className='text-slate-500'>
+          ({t('intern_jobDetail:specify_availiblity')})  </span> 
         </label>
       </div>
-      <p className='mt-5 font-semibold text-xl'>Custom resume <span className='text-slate-500'>(Optional)</span></p>
-      <small className='text-slate-500'>Employer can download and view this resume</small>
+      <p className='mt-5 font-semibold text-xl'>{t('intern_jobDetail:custom_resume')}  <span className='text-slate-500'>({t('intern_jobDetail:Optional')} )</span></p>
+      <small className='text-slate-500'>{t('intern_jobDetail:employer_can_download')} </small>
 
  
       <div className="submit flex justify-center">
         {user?(
-    <button className='submit-btn' onClick={submitApplication}  >Submit application</button>
+    <button className='submit-btn' onClick={submitApplication}  >{t('intern_jobDetail:submit_application')}</button>
         ):(
           <Link to={"/register"}>
-          <button className='submit-btn' >Submit application</button>
+          <button className='submit-btn' >{t('intern_jobDetail:submit_application')} </button>
           </Link>
         )
           

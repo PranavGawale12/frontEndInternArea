@@ -1,0 +1,19 @@
+{
+    "company_name":"कंपनी का नाम",
+    "cover_letter":"कवर लेटर",
+    "date":"आवेदन तिथि",
+    "applied_by":"एप्लाइड बाय",
+    "total_applications":"कुल अनुप्रयोग",
+    "company":"कंपनी",
+    "category":"श्रेणी",
+    "applied_on":"एप्लाइड ओन्",
+    "view_detail":"विवरण देखें",
+    "application_status":"आवेदन स्थिति",
+    "view_all_applications":"सभी ऐप्लिकेशन देखें",
+    "view_in_detail":"विस्तार से देखें",
+    "accept":"स्वीकार करें",
+    "reject":"अस्वीकार करें",
+    "UID":"यूआईडी",
+    "email":"ईमेल",
+    "view_applications":"एप्लिकेशन देखें"
+}

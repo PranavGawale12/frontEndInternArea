@@ -1,0 +1,22 @@
+{
+    "filter":"Filter",
+    "profile":"Profile",
+    "location":"Location",
+    "work_from_home":"Work From home",
+    "part_time":"Part-time",
+    "desired_stipend":"Desired minimum monthly Stipend",
+    "view_more_filters":"View more filters",
+    "clear":"Clear all",
+    "total_internships":"total internships",
+    "total_jobs":"total Jobs",
+    "salary":"Salary",
+    "actively_hiring":"Actively Hiring",
+    "start_date":"Start Date",
+    "duration":"Duration",
+    "stipend":"Stipend",
+    "internship":"Internship",
+    "view_deatils":"View In Deatils",
+    "annual_salary":" Annual salary (in lakhs)",
+    "experince":"Experience",
+    "job":"Job"
+} 

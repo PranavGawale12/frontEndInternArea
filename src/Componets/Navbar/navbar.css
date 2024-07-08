@@ -16,7 +16,13 @@ ul{
 }
 .elem{
     display: flex;
+    margin-left: 30px;
+    justify-content: space-between;
+}
+.lang{
+    position: relative;
     margin-left: 34px;
+    margin-top: 30px;
     justify-content: space-between;
 }
 ul p{
@@ -72,7 +78,7 @@ ul p{
 
 .hire{
     position: relative;
-    left: 33%;
+    left: 32%;
 justify-content: center;
 margin-top: 20px;
 height: 30px;
@@ -82,7 +88,7 @@ font-weight: 500;
 }
 .admin{
     position: relative;
-    left: 36%;
+    left: 28%;
     margin-top: 18px;
 }
 .admin button{

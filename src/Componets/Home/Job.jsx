@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next';
 
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+
 function Job() {
     const [currentSlide,setCurrentSlide]=useState(0)
     const [selectedCategory,setSelectedCategory]= useState("Big Brands")
     const [JobData, setJobData]=useState([])
+    const { t } = useTranslation(['home']); 
 
     useEffect(()=>{
         const fetchData= async()=>{
@@ -19,6 +22,8 @@ function Job() {
     }
     fetchData();
     },[])
+
+
 
     const handleJob=(direction)=>{
         const contianer=document.getElementById("container3");
@@ -40,22 +45,22 @@ function Job() {
     <div className="info-intern mt-12">
     
         <div className="categories flex flex-wrap mt-14">
-<p>POPULAR CATEGORIES :</p>
-<span className={`category mr-4 ml-6 ${ selectedCategory==='Big Brands'?'bg-blue-500 text-white':""}`} onClick={()=>setSelectedCategory('Big Brands')}>Big Brands</span>
+<p>{t('home:categories')} :</p>
+<span className={`category mr-4 ml-6 ${ selectedCategory==='Big Brands'?'bg-blue-500 text-white':""}`} onClick={()=>setSelectedCategory('Big Brands')}>{t('home:big_brands')}Big Brands</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="Work From Home"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("Work From Home")}>Work From Home</span>
+""}`} onClick={()=>setSelectedCategory("Work From Home")}>{t('home:work_from_home')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="Part-time"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("Part-time")}>Part-time</span>
+""}`} onClick={()=>setSelectedCategory("Part-time")}>{t('home:part_time')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="MBA"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("MBA")}>MBA</span>
+""}`} onClick={()=>setSelectedCategory("MBA")}>{t('home:mba')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="Engineering"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("Engineering")}>Engineering</span>
+""}`} onClick={()=>setSelectedCategory("Engineering")}>{t('home:engineering')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="media"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("media")}>Media</span>
+""}`} onClick={()=>setSelectedCategory("media")}>{t('home:media')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="Design"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("Design")}>Design</span>
+""}`} onClick={()=>setSelectedCategory("Design")}>{t('home:design')}</span>
 <span className={`category mr-4 ml-6 ${selectedCategory==="Data Science"?'bg-blue-500 text-white':
-""}`} onClick={()=>setSelectedCategory("Data Science")}>Data Science</span>
+""}`} onClick={()=>setSelectedCategory("Data Science")}>{t('home:data_science')}</span>
         </div>
         </div>
         <div className="internships" id='container3'>
@@ -64,7 +69,7 @@ function Job() {
 filterInternShips.map(( data,index)=>(
       
         <div className="int-1 mt-6" key={index}>
-<p className='mb-4 mt-3' id='boxer'> <i className='bi bi-arrow-up-right text-blue-500' ></i> Actively Hiring</p>
+<p className='mb-4 mt-3' id='boxer'> <i className='bi bi-arrow-up-right text-blue-500' ></i>{t('home:actively_hiring')}</p>
 <p>{data.title}</p>
 <small className='text-slate-400 text-sm'>{data.company}</small>
    
@@ -73,10 +78,10 @@ filterInternShips.map(( data,index)=>(
         <p className='mt-1'> <i class="bi bi-cash-stack"></i> {data.CTC}</p>
         <p className='mt-1'><i class="bi bi-calendar-fill"></i> {data.Experience}</p>
         <div className='more flex justify-between mt-6'>
-            <span className='bg-slate-200 text-slate-400 w-20 rounded-sm text-center'>Job</span>
+            <span className='bg-slate-200 text-slate-400 w-20 rounded-sm text-center'>{t('home:job')}</span>
   <Link to={`detailjob?q=${data._id}`}>
    <span className='text-blue-500 mr-2'> 
-View details <i class="bi bi-chevron-right"></i>
+   {t('home:view_deatils')} <i class="bi bi-chevron-right"></i>
    </span></Link>
         </div>
         </div>

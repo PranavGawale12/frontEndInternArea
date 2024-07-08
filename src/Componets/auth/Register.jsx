@@ -4,7 +4,10 @@ import './register.css'
 import { auth, provider, phoneProvider } from "../../firebase/firebase"
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 import PhoneInput from 'react-phone-input-2'
+import uaParser from 'ua-parser-js'
+import axios from 'axios'
 import 'react-phone-input-2/lib/style.css'
 
 function Register() {
@@ -17,20 +20,41 @@ function Register() {
   const [phone, setPhone] = useState("")
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [verificationCode, setVerificationCode] = useState('');
+  const { t } = useTranslation(['register']);
 
 
   let navigate = useNavigate()
 
-  const handleSignin = () => {
+  const handleSignin = async () => {
 
-    signInWithPopup(auth, provider).then((res) => {
+    await signInWithPopup(auth, provider).then(async (res) => {
       console.log(res)
+      const user = res.user;
+
+      const userAgent = navigator.userAgent;
+      const parseUA = uaParser(userAgent);
+      const browserName = parseUA.browser.name;
+      const osName = parseUA.os.name;
+      const deviceType = parseUA.device.type || 'desktop';
+      const ipAddress = await getIpAddress();
+
+      await axios.post('http://localhost:5000/api/login-history', {
+        userId: user.uid,
+        browser: browserName,
+        os: osName,
+        deviceType: deviceType,
+        ipAddress: ipAddress,
+      });
+
       navigate("/")
     }).catch((err) => {
       console.log(err)
     })
     toast("Login Success")
+  }
 
+  const getIpAddress = async () => {
+    const response = await axios.get('https://api.ipify.org?format=json')
   }
 
   const handleEmailSignup = async (e) => {
@@ -52,91 +76,6 @@ function Register() {
 
   }
 
-  // // const setupRecaptcha = () => {
-  // //   if (!window.recaptchaVerifier) {
-  // //     window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-  // //       // 'size': 'invisible',
-  // //       // 'callback': (response) => {
-  // //       //   console.log('reCAPTCHA solved');
-  // //       // },
-  // //       // 'expired-callback': () => {
-  // //       //   console.log('reCAPTCHA expired, please solve it again.');
-  // //       // }
-  // //     }, auth);
-  // //   }
-  // // };
-  // const handlePhoneSignup = async (e) => {
-  //   e.preventDefault();
-  //   if (isSubmitting) return;
-  //   setIsSubmitting(true);
-  //   try {
-  //     console.log(`+${phone}`);
-  //     const recaptchaVerifier = new RecaptchaVerifier(auth,'recaptcha-container',{});
-  //     const result = await signInWithPhoneNumber(auth, `+${phone}`, recaptchaVerifier);
-  //     console.log(result);
-  //     setConfirmationResult(result);
-  //     alert('SMS sent. Please check your phone.');
-  //   } catch (error) {
-  //     console.log(error);
-  //     alert("Phone number sign up failed");
-  //   }
-  //   setIsSubmitting(false);
-  // };
-  // // const handlePhoneSignup = (e) => {
-  // //   e.preventDefault();
-  // //   setupRecaptcha();
-  // //   const appVerifier = window.recaptchaVerifier;
-
-  // //   signInWithPhoneNumber(auth, `+${phone}`, appVerifier)
-  // //     .then((confirmationResult) => {
-  // //       setConfirmationResult(confirmationResult);
-  // //       console.log('SMS sent');
-  // //     })
-  // //     .catch((error) => {
-  // //       console.error('Error during phone signup:', error);
-  // //     });
-  // // };
-
-  // const verifyCode = async (e) => {
-  //   e.preventDefault();
-  //   if (isSubmitting) return;
-  //   setIsSubmitting(true);
-  //   try {
-  //     const userCredential = await confirmationResult.confirm(verificationCode);
-  //     const user = userCredential.user;
-  //     const fullName = `${fname} ${lname}`;
-  //     await updateProfile(user, {
-  //       displayName: fullName
-  //     });
-  //     console.log(user);
-  //     showLogin();
-  //     navigate("/register");
-  //   } catch (error) {
-  //     alert('Verification code incorrect');
-  //   }
-  //   setIsSubmitting(false);
-  // };
-
-  // // const verifyCode = (e) => {
-  // //   e.preventDefault();
-  // //   confirmationResult.confirm(verificationCode)
-  // //     .then((result) => {
-  // //       const user = result.user;
-  // //       const displayName = `${fname} ${lname}`;
-  // //       updateProfile(user, { displayName })
-  // //         .then(() => {
-  // //           console.log('Profile updated');
-  // //           showLogin();
-  // //           navigate("/register");
-  // //         })
-  // //         .catch((error) => {
-  // //           console.error('Error updating profile:', error);
-  // //         });
-  // //     })
-  // //     .catch((error) => {
-  // //       console.error('Error verifying code:', error);
-  // //     });
-  // // };
 
   const setupRecaptcha = () => {
     if (window.recaptchaVerifier) {
@@ -202,8 +141,25 @@ function Register() {
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const response = await signInWithEmailAndPassword(auth, email, password);
       console.log("Login successful");
+      const user = response.user;
+
+      const userAgent = navigator.userAgent;
+      const parseUA = uaParser(userAgent);
+      const browserName = parseUA.browser.name;
+      const osName = parseUA.os.name;
+      const deviceType = parseUA.device.type || 'desktop';
+      const ipAddress = await getIpAddress();
+
+      await axios.post('http://localhost:5000/api/login-history', {
+        userId: user.uid,
+        browser: browserName,
+        os: osName,
+        deviceType: deviceType,
+        ipAddress: ipAddress,
+      });
+
       navigate("/");
     } catch (error) {
       alert('Login Failed');
@@ -214,9 +170,24 @@ function Register() {
     e.preventDefault();
     if (confirmationResult) {
       confirmationResult.confirm(verificationCode)
-        .then((result) => {
+        .then(async (result) => {
           const user = result.user;
           console.log(user);
+
+          const userAgent = navigator.userAgent;
+          const parseUA = uaParser(userAgent);
+          const browserName = parseUA.browser.name;
+          const osName = parseUA.os.name;
+          const deviceType = parseUA.device.type || 'desktop';
+          const ipAddress = await getIpAddress();
+
+          await axios.post('http://localhost:5000/api/login-history', {
+            userId: user.uid,
+            browser: browserName,
+            os: osName,
+            deviceType: deviceType,
+            ipAddress: ipAddress,
+          });
           navigate("/");
           const recaptchaContainer = document.getElementById('recaptcha-container');
           recaptchaContainer.innerHTML = '';
@@ -243,8 +214,8 @@ function Register() {
   return (
     <div>
       <div className="form">
-        <h1>Sign-up and Apply For Free</h1>
-        <p className='para3'>1,50,000+ companies hiring on Internshala</p>
+        <h1>{t('register:signup')}</h1>
+        <p className='para3'>{t('register:companies_hiring')}</p>
         <div className="regi">
           <div className="py-6">
             <div className="flex bg-white rounded-lg justify-center shadow-lg overflow-hidden mx-auto max-w-sm lg:max-w-4xl">
@@ -258,38 +229,38 @@ function Register() {
                       <path d="M36.3425 16.7358H35V16.6667H20V23.3333H29.4192C28.7592 25.1975 27.56 26.805 26.0133 27.9758C26.0142 27.975 26.015 27.975 26.0158 27.9742L31.1742 32.3392C30.8092 32.6708 36.6667 28.3333 36.6667 20C36.6667 18.8825 36.5517 17.7917 36.3425 16.7358Z" fill="#1976D2" />
                     </svg>
                   </div>
-                  <h1 class="cursor-pointer px-4 py-3 w-5/6 text-center text-xl text-gray-600 font-bold">Sign in with Google</h1>
+                  <h1 class="cursor-pointer px-4 py-3 w-5/6 text-center text-xl text-gray-600 font-bold">{t('register:signin_with_google')}</h1>
 
                 </a>
                 <div className="mt-4 flex items-center justify-between">
                   <span className='border-b w-1/5 lg:w1/4'></span>
-                  <p className='text-xs text-center text-gray-500 uppercase'>or</p>
+                  <p className='text-xs text-center text-gray-500 uppercase'>{t('register:or')}</p>
                   <span className='border-b w-1/5 lg:w1/4'></span>
                 </div>
                 <form onSubmit={handleEmailSignup}>
                   <div className="mt-4">
-                    <label htmlFor="email" className='border-b text-gray-700 text-sm font-bold mb-2'>Email</label>
+                    <label htmlFor="email" className='border-b text-gray-700 text-sm font-bold mb-2'>{t('register:email')}</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='email' />
                   </div>
                   <div className="mt-4">
-                    <label htmlFor="password" className='border-b text-gray-700 text-sm font-bold mb-2'>Password</label>
+                    <label htmlFor="password" className='border-b text-gray-700 text-sm font-bold mb-2'>{t('register:password')}</label>
                     <input type="text" value={password} onChange={(e) => setPassword(e.target.value)} className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='password' />
                   </div>
                   <div className="mt-4 flex justify-between">
                     <div>
-                      <label htmlFor="Fname" className='border-b text-gray-700 text-sm font-bold mb-2'>First Name</label>
+                      <label htmlFor="Fname" className='border-b text-gray-700 text-sm font-bold mb-2'>{t('register:fname')}</label>
                       <input type="text" className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='Fname' value={fname} onChange={(e) => setFname(e.target.value)} />
                     </div>
                     <div className='ml-5'>
-                      <label htmlFor="Lname" className='border-b text-gray-700 text-sm font-bold mb-2'>Last Name</label>
+                      <label htmlFor="Lname" className='border-b text-gray-700 text-sm font-bold mb-2'>{t('register:lname')}</label>
                       <input type="text" className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='Lname' value={lname} onChange={(e) => setLname(e.target.value)} />
                     </div>
                   </div>
-                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Signup with Email</button>
+                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>{t('register:signup_with_email')}</button>
                 </form>
                 <div className="mt-4 flex items-center justify-between">
                   <span className='border-b w-1/5 lg:w1/4'></span>
-                  <p className='text-xs text-center text-gray-500 uppercase'>or</p>
+                  <p className='text-xs text-center text-gray-500 uppercase'>{t('register:or')}</p>
                   <span className='border-b w-1/5 lg:w1/4'></span>
                 </div>
                 <form onSubmit={handlePhoneSignup}>
@@ -309,23 +280,23 @@ function Register() {
                     />
                   </div>
                   <div id="recaptcha-container"></div>
-                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>SignUp with Phone</button>
+                  <button type="submit" className='bg-blue-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>{t('register:signup_with_phone')}</button>
                 </form>
                 {
                   confirmationResult && (
                     <form onSubmit={verifyCode}>
                       <div className="mt-4">
-                        <label htmlFor="verificationCode" className='border-b text-gray-700 text-sm font-bold mb-2'>Verification Code</label>
+                        <label htmlFor="verificationCode" className='border-b text-gray-700 text-sm font-bold mb-2'>{t('register:verification')}</label>
                         <input type="text" value={verificationCode} onChange={(e) => setVerificationCode(e.target.value)} className='text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none' id='verificationCode' />
                       </div>
-                      <button type="submit"  className='bg-gray-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>Verify Code</button>
+                      <button type="submit" className='bg-gray-500 h-9 text-white font-bold py-2 mt-4 px-4 w-full rounded hover:bg-blue-600'>{t('register:verify')}</button>
                     </form>
                   )
                 }
 
-                <small>By signing up, you agree to our <span className='text-blue-400'>Term and Conditions.
+                <small>{t('register:agree')} <span className='text-blue-400'>{t('register:terms')}
                 </span>
-                  Already registered? </small><span className='text-blue-400 cursor-pointer' onClick={showLogin}>Login</span>
+                  {t('register:already_registered')}? </small><span className='text-blue-400 cursor-pointer' onClick={showLogin}>{t('register:login')}</span>
               </div>
             </div>
           </div>
@@ -338,11 +309,11 @@ function Register() {
               <button id='cross' onClick={closeLogin}><i class="bi bi-x"></i></button>
               <h5 id='state' className='mb-4 justify-center text-center'>
                 <span id='Sign-in' style={{ cursor: "pointer" }} className={`auth-tab ${isStudent ? 'active' : ""}`} onClick={setFalseForStudent}>
-                  Student
+                  {t('register:student')}
                 </span>
                 &nbsp;     &nbsp; &nbsp;    &nbsp;    &nbsp;    &nbsp;    &nbsp;
                 <span id='join-in' style={{ cursor: "pointer" }} className={`auth-tab ${isStudent ? 'active' : ""}`} onClick={setTrueForStudent}>
-                  Employee andT&P
+                  {t('register:employee')}
                 </span>
               </h5>
               {isStudent ? (
@@ -362,32 +333,32 @@ function Register() {
                               <path d="M36.3425 16.7358H35V16.6667H20V23.3333H29.4192C28.7592 25.1975 27.56 26.805 26.0133 27.9758C26.0142 27.975 26.015 27.975 26.0158 27.9742L31.1742 32.3392C30.8092 32.6708 36.6667 28.3333 36.6667 20C36.6667 18.8825 36.5517 17.7917 36.3425 16.7358Z" fill="#1976D2" />
                             </svg>
                           </div>
-                          <h1 class="cursor-pointer px-4 py-3 w-5/6 text-center text-sm text-gray-600 font-bold">Log in with Google</h1>
+                          <h1 class="cursor-pointer px-4 py-3 w-5/6 text-center text-sm text-gray-600 font-bold">{t('register:login_with_google')}</h1>
                         </p>
                         <div className="mt-4 flex items-center justify-between">
                           <span className='border-b w-1/5 lg:w1/4'></span>
-                          <p className='text-xs text-center text-gray-500 uppercase'>or</p>
+                          <p className='text-xs text-center text-gray-500 uppercase'>{t('register:or')}</p>
                           <span className='border-b w-1/5 lg:w1/4'></span>
                         </div>
                         <form onSubmit={handleEmailLogin}>
                           <div class="mt-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:email')}</label>
                             <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                           </div>
                           <div class="mt-4">
                             <div class="flex justify-between">
-                              <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                              <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                              <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:password')}</label>
+                              <a href="/" class="text-xs text-blue-500">{t('register:forget_password')}</a>
                             </div>
                             <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                           </div>
                           <div className="mt-8">
-                            <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Email</button>
+                            <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:login_with_email')}</button>
                           </div>
                         </form>
                         <div className="mt-4 flex items-center justify-between">
                           <span className='border-b w-1/5 lg:w1/4'></span>
-                          <p className='text-xs text-center text-gray-500 uppercase'>or</p>
+                          <p className='text-xs text-center text-gray-500 uppercase'>{t('register:or')}</p>
                           <span className='border-b w-1/5 lg:w1/4'></span>
                         </div>
                         <form onSubmit={handlePhoneSignup}>
@@ -404,24 +375,24 @@ function Register() {
                           </div>
                           <div className="mt-8">
                             <div id="recaptcha-container"></div>
-                            <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                            <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:login_with_phone')}</button>
                           </div>
                         </form>
                         {
                           confirmationResult && (
                             <form onSubmit={loginCodeVerify}>
                               <div class="mt-4">
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:verification')}</label>
                                 <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
                               </div>
                               <div className="mt-8">
-                                <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                                <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:verify')}</button>
                               </div>
                             </form>
                           )
                         }
                         <div className="mt-4 flex items-center justify-between">
-                          <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                          <p className='text-sm'>{t('register:new_register')}(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('register:student')}</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('register:company')}</span>) </p>
                         </div>
                       </div>
                     </div>
@@ -434,50 +405,50 @@ function Register() {
                     <div className="w-full p-8 lg:w-1/2">
                       <form>
                         <div class="mt-4">
-                          <label class="block text-gray-700 text-sm font-bold mb-2">Email </label>
+                          <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:email')}</label>
                           <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="email" placeholder='john@example.com' onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div class="mt-4">
                           <div class="flex justify-between">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                            <a href="/" class="text-xs text-blue-500">Forget Password?</a>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:password')}</label>
+                            <a href="/" class="text-xs text-blue-500">{t('register:forget_password')}</a>
                           </div>
                           <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" placeholder='Must be atleast 6 characters' type="password" onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className="mt-8">
-                          <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login</button>
+                          <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:login')}</button>
                         </div>
                       </form>
                       <form onSubmit={handlePhoneSignup}>
-                          <div className="mt-4">
-                            <PhoneInput
-                              country={'us'}
-                              value={phone}
-                              onChange={(phone) => {
-                                setPhone(phone);
-                                console.log('Phone input value:', phone);
-                              }
-                              }
-                            />
-                          </div>
-                          <div className="mt-8">
-                            <div id="recaptcha-container"></div>
-                            <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
-                          </div>
-                        </form>
+                        <div className="mt-4">
+                          <PhoneInput
+                            country={'us'}
+                            value={phone}
+                            onChange={(phone) => {
+                              setPhone(phone);
+                              console.log('Phone input value:', phone);
+                            }
+                            }
+                          />
+                        </div>
+                        <div className="mt-8">
+                          <div id="recaptcha-container"></div>
+                          <button className='btn3  bg-blue-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:login_with_phone')}</button>
+                        </div>
+                      </form>
                       {confirmationResult && (
                         <form onSubmit={loginCodeVerify}>
                           <div class="mt-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Verification Code </label>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">{t('register:verification')}</label>
                             <input class=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none" type="text" placeholder='' onChange={(e) => setVerificationCode(e.target.value)} />
                           </div>
                           <div className="mt-8">
-                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>Login with Phone Number</button>
+                            <button className='btn3  bg-gray-500 h-9 text-white font-bold py-2 px-4 w-full rounded hover:bg-blue-600 ' type='submit'>{t('register:verify')}</button>
                           </div>
                         </form>
                       )}
                       <div className="mt-4 flex items-center justify-between">
-                        <p className='text-sm'>new to internarea? Register(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>Student</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>company</span>) </p>
+                        <p className='text-sm'>{t('register:new_register')}(<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('register:student')}</span>/<span className='text-blue-500 cursor-pointer' onClick={closeLogin}>{t('register:company')}</span>) </p>
                       </div>
                     </div>
                   </div>

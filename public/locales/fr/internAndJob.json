@@ -1,0 +1,22 @@
+{
+    "filter":"Filtre",
+    "profile":"Profil",
+    "location":"Emplacement",
+    "work_from_home":"Travail à domicile",
+    "part_time":"Temps partiel",
+    "desired_stipend":"Allocation mensuelle minimale souhaitée",
+    "view_more_filters":"Afficher plus de filtres",
+    "clear":"Tout effacer",
+    "total_internships":"total des stages",
+    "actively_hiring":"Recrutement acti",
+    "start_date":"Date de début",
+    "total_jobs":"total des emplois",
+    "salary":"Salaire",
+    "job":"Travail",
+    "duration":"Durée",
+    "stipend":"Allocation",
+    "internship":"Stage",
+    "view_deatils":"Afficher en détail",
+    "annual_salary":" Salaire annuel (en lakhs)",
+    "experince":"Expérience"
+} 

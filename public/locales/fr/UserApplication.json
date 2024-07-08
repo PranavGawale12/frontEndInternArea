@@ -1,0 +1,19 @@
+{
+    "company_name":"Nom de l'entreprise",
+    "cover_letter":"Lettre de motivation",
+    "date":"Date de candidature",
+    "applied_by":"Appliqué par",
+    "total_applications":"Total des candidatures",
+    "company":"Entreprise",
+    "category":"Catégorie",
+    "applied_on":"Appliqué le",
+    "view_detail":"Afficher les détails",
+    "application_status":"Statut de la demande",
+    "view_all_applications":"Afficher toutes les applications",
+    "view_in_detail":"Voir en détail",
+    "accept":"Accepter",
+    "reject":"Rejeter",
+    "UID":"Identifiant utilisateur",
+    "email":"Email",
+    "view_applications":"Afficher les applications"
+}

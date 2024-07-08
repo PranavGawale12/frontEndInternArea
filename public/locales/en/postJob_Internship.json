@@ -1,0 +1,20 @@
+{
+    "post_a_internship":"Post A Internship",
+    "title":"title*",
+    "company_name":"Company Name*",
+    "location":"Location",
+    "category":"Category*",
+    "aboutCompany":"about Company*",
+    "aboutInternship":"about Internship*",
+    "whocanapply": "who can apply*",
+    "perks":"Perks*",
+    "numberOfOpening":"Number Of Opening*",
+    "stipend":"stipend*",
+    "start_date":"Start Date*",
+    "additional_info":"Additional Information*",
+    "post_internship":"Post Internship",
+    "post_a_job":"Post A Job",
+    "aboutJob":"about Job*",
+    "CTC":"CTC*",
+    "post_job":"Post Job"
+}
